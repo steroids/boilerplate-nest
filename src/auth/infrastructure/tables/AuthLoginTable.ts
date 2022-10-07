@@ -2,5 +2,5 @@ import {TableFromModel} from '@steroidsjs/nest/src/infrastructure/decorators/Tab
 import {DeepPartial} from 'typeorm';
 import {AuthLoginModel} from '../../domain/models/AuthLoginModel';
 
-@TableFromModel(AuthLoginModel, {name: 'auth_logins'})
+@TableFromModel(AuthLoginModel, 'auth_login')
 export class AuthLoginTable implements DeepPartial<AuthLoginModel> {}

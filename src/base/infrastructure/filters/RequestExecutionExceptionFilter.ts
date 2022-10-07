@@ -1,6 +1,6 @@
 import {ExceptionFilter, Catch, ArgumentsHost} from '@nestjs/common';
 import { Response } from 'express';
-import {RequestExecutionException} from '../../usecases/exceptions/RequestExecutionException';
+import {RequestExecutionException} from '../../domain/exceptions/RequestExecutionException';
 
 @Catch(RequestExecutionException)
 export class RequestExecutionExceptionFilter implements ExceptionFilter {

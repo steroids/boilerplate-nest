@@ -1,23 +1,18 @@
-import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {CrudRepository} from '@steroidsjs/nest/src/infrastructure/repositories/CrudRepository';
+import {UserModel} from '../../domain/models/UserModel';
 import {UserTable} from '../tables/UserTable';
-import {IUserRepository} from '../../usecases/interfaces/IUserRepository';
 
-export class UserRepository implements IUserRepository {
+@Injectable()
+export class UserRepository extends CrudRepository<UserModel> {
     constructor(
         @InjectRepository(UserTable)
         public dbRepository: Repository<UserTable>,
-    ) {}
-
-    async getAllUsers() {
-        return this.dbRepository.find();
+    ) {
+        super();
     }
 
-    async findById(id: number) {
-        return this.dbRepository.findOne(id);
-    }
-
-    async findByLogin(login: string) {
-        return this.dbRepository.findOne({login});
-    }
+    protected modelClass = UserModel;
 }

@@ -1,12 +1,17 @@
 import {NestFactory, Reflector} from '@nestjs/core';
 import {DocumentBuilder, SwaggerModule} from '@nestjs/swagger';
 import {ConfigService} from '@nestjs/config';
-import {ClassSerializerInterceptor, VersioningType} from '@nestjs/common';
+import {VersioningType} from '@nestjs/common';
 import {CreateDtoPipe} from '@steroidsjs/nest/src/infrastructure/pipes/CreateDtoPipe';
 import './envInit';
-import {SentryInterceptor} from '@ntegral/nestjs-sentry';
-import {Severity} from '@sentry/types';
 import {AppModule} from './AppModule';
+import {JwtAuthGuard} from './auth/infrastructure/guards/JwtAuthGuard';
+import {ISessionService} from './auth/domain/interfaces/ISessionService';
+import {AuthService} from './auth/domain/services/AuthService';
+import {ValidationExceptionFilter} from '@steroidsjs/nest/src/infrastructure/filters/ValidationExceptionFilter';
+import {UserExceptionFilter} from '@steroidsjs/nest/src/infrastructure/filters/UserExceptionFilter';
+import {SentryExceptionFilter} from './SentryExceptionFilter';
+import {SchemaSerializer} from './SchemaSerializer';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -67,14 +72,19 @@ async function bootstrap() {
 
     // Validation
     app.useGlobalPipes(new CreateDtoPipe());
+    app.useGlobalFilters(new ValidationExceptionFilter());
+    app.useGlobalFilters(new UserExceptionFilter());
 
-    // Serializer
+    if (process.env.APP_SENTRY_DSN) {
+        app.useGlobalFilters(new SentryExceptionFilter());
+    }
+
     app.useGlobalInterceptors(
-        new ClassSerializerInterceptor(app.get(Reflector)),
-        new SentryInterceptor({
-            level: Severity.Warning,
-        }),
+        new SchemaSerializer(app.get(Reflector)),
     );
+
+    // Guards
+    app.useGlobalGuards(new JwtAuthGuard(app.get(ISessionService), app.get(AuthService)));
 
     // Start application
     const port = configService.get('port');

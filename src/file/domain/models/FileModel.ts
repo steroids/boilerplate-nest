@@ -1,43 +1,79 @@
 import {
-    CreateTimeField,
-    IntegerField,
-    PrimaryKeyField, RelationField,
+    RelationField,
+    PrimaryKeyField,
     StringField,
-    UidField,
+    CreateTimeField, IntegerField, UidField,
 } from '@steroidsjs/nest/src/infrastructure/decorators/fields';
-import {FileImageModel} from './FileImageModel';
+import { FileImageModel } from './FileImageModel';
 
+/**
+ * Файлы
+ */
 export class FileModel {
     @PrimaryKeyField()
     id: number;
 
-    @UidField()
+    @UidField({
+        label: 'Уникальный UUID',
+    })
     uid: string;
 
-    // Original file name
-    @StringField()
+    @StringField({
+        label: 'MD5 хеш',
+        max: 32,
+        nullable: true,
+    })
+    md5: string;
+
+    @StringField({
+        label: 'Название загружаемого файла',
+        nullable: true,
+    })
     title: string;
 
-    // System file name
-    @StringField()
+    @StringField({
+        label: 'Url по которому доступен файл',
+        noColumn: true,
+    })
+    url: string;
+
+    @StringField({
+        label: 'Имя хранилища',
+        nullable: true,
+    })
+    storageName: string;
+
+    @StringField({
+        label: 'Название сохраненного файла',
+    })
     fileName: string;
 
-    @IntegerField()
+    @IntegerField({
+        label: 'Размер файла (байты)',
+    })
     fileSize: number;
 
-    @StringField()
+    @StringField({
+        label: 'MIME тип файла',
+    })
     fileMimeType: string;
 
-    @StringField()
+    @StringField({
+        label: 'Относительный путь до под-директории',
+        nullable: true,
+    })
     folder: string;
 
-    @CreateTimeField()
-    createTime: Date;
+    @CreateTimeField({
+        label: 'Создан',
+    })
+    createTime: string;
 
     @RelationField({
+        label: '',
         type: 'OneToMany',
+        inverseSide: (image: FileImageModel) => image.file,
         relationClass: () => FileImageModel,
-        inverseSide: image => image.file,
     })
     images: FileImageModel[];
 }

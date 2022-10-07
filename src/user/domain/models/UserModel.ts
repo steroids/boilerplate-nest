@@ -1,44 +1,84 @@
 import {
-    CreateTimeField, EmailField,
-    PasswordField,
+    RelationField,
     PrimaryKeyField,
-    StringField, UpdateTimeField,
+    StringField,
+    PasswordField,
+    PhoneField,
+    EmailField,
+    BooleanField,
+    CreateTimeField,
+    UpdateTimeField, RelationIdField,
 } from '@steroidsjs/nest/src/infrastructure/decorators/fields';
-import {UserRole} from '../enums/UserRole';
+import {AuthRoleModel} from '../../../auth/domain/models/AuthRoleModel';
 
+/**
+ * Пользователь системы
+ */
 export class UserModel {
     @PrimaryKeyField()
     id: number;
 
     @StringField({
-        label: 'Роль',
-        defaultValue: UserRole.ADMIN,
-    })
-    role: string;
-
-    @StringField({
-        label: 'Логин',
+        label: 'Логин пользователя (для операторов)',
+        nullable: true,
     })
     login: string;
 
     @PasswordField({
-        label: 'Хэш пароля',
+        label: 'Хеш пароля',
         nullable: true,
     })
     passwordHash: string;
 
-    @EmailField({
+    @PhoneField({
+        label: 'Телефон',
+        unique: true,
         nullable: true,
+        max: 20,
+    })
+    phone: string;
+
+    @EmailField({
+        label: 'Email',
+        nullable: true,
+        unique: true,
     })
     email: string;
+
+    @StringField({
+        label: 'Язык интерфейса, ISO 639-1',
+        nullable: true,
+    })
+    languageCode: string;
+
+    @BooleanField({
+        label: 'Заблокирован?',
+    })
+    isBanned: boolean;
 
     @CreateTimeField({
         label: 'Создан',
     })
-    createTime: Date;
+    createTime: string;
 
     @UpdateTimeField({
         label: 'Обновлен',
     })
-    updateTime: Date;
+    updateTime: string;
+
+    @RelationField({
+        label: '',
+        type: 'ManyToMany',
+        isOwningSide: false,
+        relationClass: () => AuthRoleModel,
+        inverseSide: (role: AuthRoleModel) => role.users,
+    })
+    authRoles: AuthRoleModel[];
+
+    @RelationIdField({
+        nullable: true,
+        relationName: 'authRoles',
+        isArray: true,
+    })
+    authRolesIds: number[];
 }

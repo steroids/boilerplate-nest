@@ -1,9 +1,16 @@
-import {Controller, Post, Put, UploadedFile} from '@nestjs/common';
+import {Controller, Put, Query, UploadedFile} from '@nestjs/common';
+import {ApiOkResponse, ApiQuery} from '@nestjs/swagger';
+import {DataMapper} from '@steroidsjs/nest/src/usecases/helpers/DataMapper';
 import {FileUpload} from '../decorators/FileUpload';
-import {IFile} from '../../usecases/interfaces/IFile';
-import {ImageUploadSchema} from '../schemas/ImageUploadSchema';
-import {FileService} from '../../usecases/services/FileService';
-import {ImageEditorUploadSchema} from '../schemas/ImageEditorUploadSchema';
+import {IExpressSource} from '../../domain/interfaces/IExpressSource';
+import {FileService} from '../../domain/services/FileService';
+import {FileUploadOptions} from '../../domain/dtos/FileUploadOptions';
+import {FileExpressSourceDto} from '../../domain/dtos/sources/FileExpressSourceDto';
+import {FileUploadDto} from '../../domain/dtos/FileUploadDto';
+import {FileImageSchema} from '../schemas/FileImageSchema';
+import {AuthPermissions} from '../../../auth/infrastructure/decorators/AuthPermissions';
+import {PERMISSION_AUTH_AUTHORIZED} from '../../../auth/infrastructure/permissions';
+import {FileSchema} from '../schemas/FileSchema';
 
 @Controller('/file')
 export default class FileController {
@@ -13,17 +20,38 @@ export default class FileController {
     }
 
     @Put('/upload-photo')
+    @AuthPermissions(PERMISSION_AUTH_AUTHORIZED)
+    @ApiQuery({type: FileUploadDto})
+    @ApiOkResponse({type: FileImageSchema})
     @FileUpload()
-    async photos(@UploadedFile() file: IFile): Promise<ImageUploadSchema> {
-        return ImageUploadSchema.createFromImageModels(await this.fileService.uploadImage(file));
+    async photos(
+        @Query() dto: FileUploadDto,
+        @UploadedFile() file: IExpressSource,
+    ) {
+        return this.fileService.upload(
+            DataMapper.create<FileUploadOptions>(FileUploadOptions, {
+                ...dto,
+                source: DataMapper.create(FileExpressSourceDto, file),
+            }),
+            FileImageSchema,
+        );
     }
 
-    @Post('/upload-photo-editor')
-    @FileUpload({
-        fileFieldName: 'upload',
-    })
-    async photosEditor(@UploadedFile() file: IFile): Promise<ImageEditorUploadSchema> {
-        const uploadedFile = await this.fileService.uploadImage(file);
-        return new ImageEditorUploadSchema(uploadedFile);
+    @Put('/upload-file')
+    @AuthPermissions(PERMISSION_AUTH_AUTHORIZED)
+    @ApiQuery({type: FileUploadDto})
+    @ApiOkResponse({type: FileSchema})
+    @FileUpload()
+    async files(
+        @UploadedFile() file: IExpressSource,
+        @Query()dto: FileUploadDto,
+    ) {
+        return this.fileService.upload(
+            DataMapper.create<FileUploadOptions>(FileUploadOptions, {
+                ...dto,
+                source: DataMapper.create(FileExpressSourceDto, file),
+            }),
+            FileSchema,
+        );
     }
 }

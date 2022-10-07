@@ -3,7 +3,7 @@ import {
     RelationField,
     StringField,
     CreateTimeField,
-    UpdateTimeField, UidField, BooleanField,
+    UpdateTimeField, UidField, RelationIdField, BooleanField,
 } from '@steroidsjs/nest/src/infrastructure/decorators/fields';
 import { UserModel } from '../../../user/domain/models/UserModel';
 
@@ -24,13 +24,21 @@ export class AuthLoginModel {
     })
     user: UserModel;
 
+    @RelationIdField({
+        nullable: true,
+        relationName: 'user',
+    })
+    userId: number;
+
     @StringField({
         label: 'Токен доступа',
+        noColumn: true,
     })
     accessToken: string;
 
     @StringField({
         label: 'Время истечения токена',
+        noColumn: true,
     })
     accessExpireTime: Date;
 
@@ -64,16 +72,17 @@ export class AuthLoginModel {
 
     @BooleanField({
         label: 'Отозван?',
+        nullable: true,
     })
     isRevoked: boolean;
 
     @CreateTimeField({
         label: 'Создан',
     })
-    createTime: Date;
+    createTime: string;
 
     @UpdateTimeField({
         label: 'Обновлен',
     })
-    updateTime: Date;
+    updateTime: string;
 }

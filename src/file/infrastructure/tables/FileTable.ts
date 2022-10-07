@@ -1,6 +1,6 @@
-import {DeepPartial} from 'typeorm';
 import {TableFromModel} from '@steroidsjs/nest/src/infrastructure/decorators/TableFromModel';
-import {FileModel} from '../../domain/models/FileModel';
+import {DeepPartial} from 'typeorm';
+import { FileModel } from '../../domain/models/FileModel';
 
-@TableFromModel(FileModel, 'files')
+@TableFromModel(FileModel, 'file')
 export class FileTable implements DeepPartial<FileModel> {}

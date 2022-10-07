@@ -1,57 +1,78 @@
-import {Module} from '@nestjs/common';
+import {forwardRef, Module} from '@nestjs/common';
+import {ModuleHelper} from '@steroidsjs/nest/src/infrastructure/helpers/ModuleHelper';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {FileTable} from './tables/FileTable';
-import {FileService} from '../usecases/services/FileService';
-import {FILE_REPOSITORY_PROVIDER_NAME} from '../usecases/interfaces/IFileRepository';
+import {ConfigModule, ConfigService} from '@nestjs/config';
+import {IFileRepository} from '../domain/interfaces/IFileRepository';
 import {FileRepository} from './repositories/FileRepository';
-import {FILE_IMAGE_REPOSITORY_PROVIDER_NAME} from '../usecases/interfaces/IFileImageRepository';
+import {IFileImageRepository} from '../domain/interfaces/IFileImageRepository';
 import {FileImageRepository} from './repositories/FileImageRepository';
-import {FileImageService} from '../usecases/services/FileImageService';
-import {FileImageTable} from './tables/FileImageTable';
-import FileController from './controllers/FileController';
-
-const fileRepositoryProvider = {
-    provide: FILE_REPOSITORY_PROVIDER_NAME,
-    useClass: FileRepository,
-};
-
-const fileImageRepositoryProvider = {
-    provide: FILE_IMAGE_REPOSITORY_PROVIDER_NAME,
-    useClass: FileImageRepository,
-};
+import {FileService} from '../domain/services/FileService';
+import {FileImageService} from '../domain/services/FileImageService';
+import {FileConfigService} from '../domain/services/FileConfigService';
+import {FileMaxSizeValidator} from '../domain/validators/FileMaxSizeValidator';
+import {FileMimeTypesValidator} from '../domain/validators/FileMimeTypesValidator';
+import {FileStorageFabric} from '../domain/services/FileStorageFabric';
+import {FileLocalStorage} from '../domain/storages/FileLocalStorage';
+import {MinioS3Storage} from '../domain/storages/MinioS3Storage';
+import FileStorageEnum from '../domain/enums/FileStorageEnum';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            FileTable,
-            FileImageTable,
-        ]),
+        forwardRef(() => ConfigModule),
+        TypeOrmModule.forFeature(ModuleHelper.importDir(__dirname + '/tables')),
+
     ],
+    controllers: ModuleHelper.importDir(__dirname + '/controllers'),
     providers: [
-        fileRepositoryProvider,
         {
-            inject: [FILE_REPOSITORY_PROVIDER_NAME, FileImageService],
-            provide: FileService,
-            useFactory: (
-                repository: FileRepository,
-                fileImageService: FileImageService,
-            ) => new FileService(repository, fileImageService),
+            provide: IFileRepository,
+            useClass: FileRepository,
         },
-        fileImageRepositoryProvider,
         {
-            inject: [FILE_IMAGE_REPOSITORY_PROVIDER_NAME],
-            provide: FileImageService,
-            useFactory: (
-                repository: FileImageRepository,
-            ) => new FileImageService(repository),
+            provide: IFileImageRepository,
+            useClass: FileImageRepository,
         },
-    ],
-    controllers: [
-        FileController,
+        {
+            inject: [ConfigService],
+            provide: FileConfigService,
+            useFactory: (configService) => new FileConfigService(configService.get('file')),
+        },
+        FileMaxSizeValidator,
+        FileMimeTypesValidator,
+        FileLocalStorage,
+        MinioS3Storage,
+        {
+            inject: [FileConfigService, FileLocalStorage, MinioS3Storage],
+            provide: FileStorageFabric,
+            useFactory: (
+                fileConfigService,
+                fileLocalStorage,
+                minioS3Storage,
+            ) => new FileStorageFabric(fileConfigService, {
+                [FileStorageEnum.LOCAL]: fileLocalStorage,
+                [FileStorageEnum.MINIO_S3]: minioS3Storage,
+            }),
+        },
+        ModuleHelper.provide(FileService, [
+            IFileRepository,
+            FileImageService,
+            FileConfigService,
+            FileStorageFabric,
+            [
+                FileMimeTypesValidator,
+                FileMaxSizeValidator,
+            ],
+        ]),
+        ModuleHelper.provide(FileImageService, [
+            IFileImageRepository,
+            FileConfigService,
+            FileStorageFabric,
+        ]),
     ],
     exports: [
         FileService,
-        fileImageRepositoryProvider,
+        FileImageService,
     ],
 })
-export class FileModule {}
+export class FileModule {
+}

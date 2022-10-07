@@ -1,41 +1,32 @@
 import {forwardRef, Module} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {CrudRepository} from '@steroidsjs/nest/src/infrastructure/repositories/CrudRepository';
-import {CrudService} from '@steroidsjs/nest/src/usecases/services/CrudService';
-import {UserTable} from './tables/UserTable';
-import {UserService} from '../usecases/services/UserService';
-import {AuthModule} from '../../auth/infrastructure/AuthModule';
+import {ModuleHelper} from '@steroidsjs/nest/src/infrastructure/helpers/ModuleHelper';
 import {UserRepository} from './repositories/UserRepository';
-import {UsersController} from './controllers/UsersController';
-import {USER_REPOSITORY_PROVIDER_NAME} from '../usecases/interfaces/IUserRepository';
-
-const userRepositoryProvider = {
-    provide: USER_REPOSITORY_PROVIDER_NAME,
-    useClass: UserRepository,
-};
+import {UserTable} from './tables/UserTable';
+import {UserService} from '../domain/services/UserService';
+import {IUserRepository} from '../domain/interfaces/IUserRepository';
+import {AuthModule} from '../../auth/infrastructure/AuthModule';
+import {ISessionService} from '../../auth/domain/interfaces/ISessionService';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([UserTable]),
         forwardRef(() => AuthModule),
     ],
-    controllers: [
-        UsersController,
-    ],
     providers: [
-        CrudRepository,
-        CrudService,
-        userRepositoryProvider,
         {
-            inject: [USER_REPOSITORY_PROVIDER_NAME],
-            provide: UserService,
-            useFactory: (
-                repository: UserRepository,
-            ) => new UserService(repository),
+            provide: IUserRepository,
+            useClass: UserRepository,
         },
+        ModuleHelper.provide(UserService, [
+            IUserRepository,
+            ISessionService,
+        ]),
     ],
     exports: [
         UserService,
+        IUserRepository,
     ],
 })
-export class UserModule {}
+export class UserModule {
+}

@@ -1,78 +1,123 @@
-import {forwardRef, Module} from '@nestjs/common';
+import {forwardRef, Global, Module} from '@nestjs/common';
 import {JwtModule} from '@nestjs/jwt';
 import {ConfigModule, ConfigService} from '@nestjs/config';
 import {PassportModule} from '@nestjs/passport';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {AuthController} from './controllers/AuthController';
-import {LocalStrategy} from './strategies/LocalStrategy';
-import {JwtStrategy} from './strategies/JwtStrategy';
+import {ModuleHelper} from '@steroidsjs/nest/src/infrastructure/helpers/ModuleHelper';
 import {UserModule} from '../../user/infrastructure/UserModule';
-import {AUTH_LOGIN_REPOSITORY_PROVIDER_NAME} from '../usecases/interfaces/IAuthLoginRepository';
+import {SessionService} from './services/SessionService';
+import {UserService} from '../../user/domain/services/UserService';
+import {AuthService} from '../domain/services/AuthService';
+import {AuthLoginService} from '../domain/services/AuthLoginService';
+import {AuthPermissionsService} from '../domain/services/AuthPermissionsService';
 import {AuthLoginRepository} from './repositories/AuthLoginRepository';
-import {AuthLoginTable} from './tables/AuthLoginTable';
-import {SessionService} from './session/SessionService';
-import {SESSION_SERVICE_PROVIDER} from '../usecases/interfaces/ISessionService';
-import {AuthService} from '../usecases/services/AuthService';
-import {UserService} from '../../user/usecases/services/UserService';
-import {EncryptService} from '../usecases/services/EncryptService';
+import {AuthPermissionRepository} from './repositories/AuthPermissionRepository';
+import {IAuthPermissionsRepository} from '../domain/interfaces/IAuthPermissionsRepository';
+import {IAuthLoginRepository} from '../domain/interfaces/IAuthLoginRepository';
+import {LoginPasswordStrategy} from './strategies/LoginPasswordStrategy';
+import {JwtStrategy} from './strategies/JwtStrategy';
+import {ISessionService} from '../domain/interfaces/ISessionService';
+import {NotifierModule} from '../../notifier/infrastructure/NotifierModule';
+import {IAuthConfirmRepository} from '../domain/interfaces/IAuthConfirmRepository';
+import {AuthConfirmRepository} from './repositories/AuthConfirmRepository';
+import {AuthConfirmService} from '../domain/services/AuthConfirmService';
+import {NotifierService} from '../../notifier/domain/services/NotifierService';
+import {LoginSmsCodeStrategy} from './strategies/LoginSmsCodeStrategy';
+import {IAuthRoleRepository} from '../domain/interfaces/IAuthRoleRepository';
+import {AuthRoleRepository} from './repositories/AuthRoleRepository';
+import {AuthRoleService} from '../domain/services/AuthRoleService';
+import {AuthFilePermissionService} from '../domain/services/AuthFilePermissionService';
+import {FileService} from '../../file/domain/services/FileService';
+import {FileModule} from '../../file/infrastructure/FileModule';
 
-const authLoginRepositoryProvider = {
-    provide: AUTH_LOGIN_REPOSITORY_PROVIDER_NAME,
-    useClass: AuthLoginRepository,
-};
-
-const sessionServiceProvider = {
-    provide: SESSION_SERVICE_PROVIDER,
-    useClass: SessionService,
-};
-
-const AuthServiceProvider = {
-    inject: [
-        UserService,
-        SESSION_SERVICE_PROVIDER,
-    ],
-    provide: AuthService,
-    useFactory: (
-        userUsecases,
-        sessionService,
-    ) => new AuthService(
-        userUsecases,
-        sessionService,
-    ),
-};
-
+@Global()
 @Module({
     imports: [
         ConfigModule,
         PassportModule,
+        NotifierModule,
         forwardRef(() => UserModule),
+        forwardRef(() => FileModule),
         JwtModule.registerAsync({
             imports: [ConfigModule],
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => ({
-                secret: configService.get('auth.jwtSecretKey'),
+                secret: configService.get('auth.jwtAccessSecretKey'),
             }),
         }),
-        TypeOrmModule.forFeature([AuthLoginTable]),
+        TypeOrmModule.forFeature(ModuleHelper.importDir(__dirname + '/tables')),
     ],
-    controllers: [
-        AuthController,
-    ],
+    controllers: ModuleHelper.importDir(__dirname + '/controllers'),
     providers: [
-        authLoginRepositoryProvider,
-        sessionServiceProvider,
+        {
+            provide: IAuthLoginRepository,
+            useClass: AuthLoginRepository,
+        },
+        {
+            provide: IAuthPermissionsRepository,
+            useClass: AuthPermissionRepository,
+        },
+        {
+            provide: IAuthRoleRepository,
+            useClass: AuthRoleRepository,
+        },
+        {
+            provide: ISessionService,
+            useClass: SessionService,
+        },
+        {
+            provide: IAuthConfirmRepository,
+            useClass: AuthConfirmRepository,
+        },
+        ModuleHelper.provide(AuthRoleService, [
+            IAuthRoleRepository,
+            AuthPermissionsService,
+        ]),
+        ModuleHelper.provide(AuthService, [
+            UserService,
+            ISessionService,
+            AuthLoginService,
+            AuthPermissionsService,
+            ConfigService,
+        ]),
+        ModuleHelper.provide(AuthConfirmService, [
+            IAuthConfirmRepository,
+            NotifierService,
+            UserService,
+            ConfigService,
+            AuthService,
+        ]),
+        ModuleHelper.provide(AuthLoginService, [
+            IAuthLoginRepository,
+            ConfigService,
+            ISessionService,
+        ]),
+        ModuleHelper.provide(AuthPermissionsService, [
+            IAuthPermissionsRepository,
+            IAuthRoleRepository,
+        ]),
+        ModuleHelper.provide(AuthFilePermissionService, [
+            FileService,
+        ]),
+        ModuleHelper.provide(LoginPasswordStrategy, [
+            UserService,
+            AuthService,
+            ISessionService,
+        ]),
+        ModuleHelper.provide(LoginSmsCodeStrategy, [
+            AuthConfirmService,
+            AuthService,
+            ISessionService,
+        ]),
         JwtStrategy,
-        LocalStrategy,
-        AuthServiceProvider,
-        EncryptService,
     ],
     exports: [
-        ConfigModule,
-        JwtModule,
-        authLoginRepositoryProvider,
-        sessionServiceProvider,
-        UserModule,
-        EncryptService,
+        ISessionService,
+        AuthPermissionsService,
+        AuthConfirmService,
+        AuthService,
+        AuthRoleService,
     ],
 })
-export class AuthModule {}
+export class AuthModule {
+}
