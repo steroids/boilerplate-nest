@@ -4,6 +4,7 @@ import {ConfigModule, ConfigService} from '@nestjs/config';
 import {PassportModule} from '@nestjs/passport';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ModuleHelper} from '@steroidsjs/nest/src/infrastructure/helpers/ModuleHelper';
+import * as path from 'path';
 import {UserModule} from '../../user/infrastructure/UserModule';
 import {SessionService} from './services/SessionService';
 import {UserService} from '../../user/domain/services/UserService';
@@ -45,9 +46,9 @@ import {FileModule} from '../../file/infrastructure/FileModule';
                 secret: configService.get('auth.jwtAccessSecretKey'),
             }),
         }),
-        TypeOrmModule.forFeature(ModuleHelper.importDir(__dirname + '/tables')),
+        TypeOrmModule.forFeature(ModuleHelper.importDir(path.join(__dirname, 'tables'))),
     ],
-    controllers: ModuleHelper.importDir(__dirname + '/controllers'),
+    controllers: ModuleHelper.importDir(path.join(__dirname, 'controllers')),
     providers: [
         {
             provide: IAuthLoginRepository,

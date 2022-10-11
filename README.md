@@ -38,8 +38,14 @@ psql postgres -c "GRANT ALL PRIVILEGES ON DATABASE \"boilerplatenest12345\" TO \
 1. Correct default parameters if needed
 2. Generate unique string for `AUTH_JWT_SECRET_KEY`
 
-### 4. Apply migrations
+### 4. Run migrations
 
+1. Generate migrations
+```shell
+yarn cli migrate:generate
+```
+
+2. Apply migrations
 ```shell
 yarn cli migrate
 ```
@@ -68,6 +74,10 @@ yarn build
 ```shell
 yarn start:prod
 ```
+
+## Healthcheck
+
+If `PORT` in .env set to 9300, then open http://localhost:9300/api/docs to see project's API documentation
 
 ## CI/CD
 
