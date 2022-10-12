@@ -1,5 +1,5 @@
 import {Controller, Put, Query, UploadedFile} from '@nestjs/common';
-import {ApiOkResponse, ApiQuery} from '@nestjs/swagger';
+import {ApiOkResponse, ApiQuery, ApiTags} from '@nestjs/swagger';
 import {DataMapper} from '@steroidsjs/nest/src/usecases/helpers/DataMapper';
 import {FileUpload} from '../decorators/FileUpload';
 import {IExpressSource} from '../../domain/interfaces/IExpressSource';
@@ -8,10 +8,9 @@ import {FileUploadOptions} from '../../domain/dtos/FileUploadOptions';
 import {FileExpressSourceDto} from '../../domain/dtos/sources/FileExpressSourceDto';
 import {FileUploadDto} from '../../domain/dtos/FileUploadDto';
 import {FileImageSchema} from '../schemas/FileImageSchema';
-import {AuthPermissions} from '../../../auth/infrastructure/decorators/AuthPermissions';
-import {PERMISSION_AUTH_AUTHORIZED} from '../../../auth/infrastructure/permissions';
 import {FileSchema} from '../schemas/FileSchema';
 
+@ApiTags('File')
 @Controller('/file')
 export default class FileController {
     constructor(
@@ -20,7 +19,6 @@ export default class FileController {
     }
 
     @Put('/upload-photo')
-    @AuthPermissions(PERMISSION_AUTH_AUTHORIZED)
     @ApiQuery({type: FileUploadDto})
     @ApiOkResponse({type: FileImageSchema})
     @FileUpload()
@@ -38,7 +36,6 @@ export default class FileController {
     }
 
     @Put('/upload-file')
-    @AuthPermissions(PERMISSION_AUTH_AUTHORIZED)
     @ApiQuery({type: FileUploadDto})
     @ApiOkResponse({type: FileSchema})
     @FileUpload()

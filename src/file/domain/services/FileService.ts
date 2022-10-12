@@ -11,6 +11,7 @@ import SearchQuery from '@steroidsjs/nest/src/usecases/base/SearchQuery';
 import {Type} from '@nestjs/common';
 import {toInteger as _toInteger} from 'lodash';
 import * as Sentry from '@sentry/node';
+import { ContextDto } from '@steroidsjs/nest/src/usecases/dtos/ContextDto';
 import {IFileRepository} from '../interfaces/IFileRepository';
 import {FileModel} from '../models/FileModel';
 import {FileImageService} from './FileImageService';
@@ -21,7 +22,6 @@ import {FileStorageFabric} from './FileStorageFabric';
 import {FileExpressSourceDto} from '../dtos/sources/FileExpressSourceDto';
 import {FileLocalSourceDto} from '../dtos/sources/FileLocalSourceDto';
 import {FileStreamSourceDto} from '../dtos/sources/FileStreamSourceDto';
-import { ContextDto } from '@steroidsjs/nest/src/usecases/dtos/ContextDto';
 
 export class FileService extends ReadService<FileModel> {
     constructor(
@@ -216,9 +216,5 @@ export class FileService extends ReadService<FileModel> {
             (new SearchQuery()).where({id}),
         );
         return schemaClass ? DataMapper.create(schemaClass, model) : model;
-    }
-
-    async getFileWithDocument(fileName: string) {
-        return this.repository.getFileWithDocument(fileName);
     }
 }
