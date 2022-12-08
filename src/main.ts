@@ -25,33 +25,35 @@ async function bootstrap() {
     });
 
     // Swagger config
-    const swaggerConfig = new DocumentBuilder()
-        .setTitle(configService.get('title') || 'Application')
-        .setDescription('Документация REST API')
-        .setVersion(configService.get('version') || '1.0')
-        .addBearerAuth()
-        .build();
+    if (process.env.SWAGGER_URL) {
+        const swaggerConfig = new DocumentBuilder()
+            .setTitle(configService.get('title') || 'Application')
+            .setDescription('Документация REST API')
+            .setVersion(configService.get('version') || '1.0')
+            .addBearerAuth()
+            .build();
 
-    const swaggerOptions: SwaggerDocumentOptions = {
-        ignoreGlobalPrefix: false,
-    };
+        const swaggerOptions:SwaggerDocumentOptions = {
+            ignoreGlobalPrefix: false,
+        };
 
-    const document = SwaggerModule.createDocument(app, swaggerConfig, swaggerOptions);
+        const document = SwaggerModule.createDocument(app, swaggerConfig, swaggerOptions);
 
-    // turn on basic auth to access swagger
-    if (process.env.SWAGGER_PASSWORD) {
-        app.use(
-            [process.env.SWAGGER_URL],
-            basicAuth({
-                challenge: true,
-                users: {
-                    [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD,
-                },
-            }),
-        );
+        // turn on basic auth to access swagger
+        if (process.env.SWAGGER_PASSWORD) {
+            app.use(
+                [process.env.SWAGGER_URL],
+                basicAuth({
+                    challenge: true,
+                    users: {
+                        [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD,
+                    },
+                }),
+            );
+        }
+
+        SwaggerModule.setup(process.env.SWAGGER_URL, app, document);
     }
-
-    SwaggerModule.setup(process.env.SWAGGER_URL, app, document);
 
     // Cors
     const origin = [];
