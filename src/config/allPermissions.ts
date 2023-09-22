@@ -1,4 +1,4 @@
-import auth from '../auth/infrastructure/permissions';
+import auth from '@steroidsjs/nest-auth/infrastructure/permissions';
 
 const allItems = [
     ...auth,

@@ -1,22 +1,31 @@
-import {NestFactory} from '@nestjs/core';
-import {CommandModule, CommandService} from 'nestjs-command';
-import './envInit';
-import {AppModule} from './AppModule';
+import {ConsoleApplication} from '@steroidsjs/nest/infrastructure/applications/console/ConsoleApplication';
+import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
+import baseConfig from '@steroidsjs/nest/infrastructure/applications/console/config';
+import {IConsoleAppModuleConfig} from '@steroidsjs/nest/infrastructure/applications/console/IConsoleAppModuleConfig';
+import {AuthModule} from './auth/infrastructure/AuthModule';
+import {FileModule} from './file/infrastructure/FileModule';
+import {UserModule} from './user/infrastructure/UserModule';
+import {NotifierModule} from './notifier/infrastructure/NotifierModule';
+import {InitModule} from './init/infrastructure/InitModule';
 
-process.env.APP_IS_CLI = '1';
-
-async function bootstrap() {
-    const app = await NestFactory.createApplicationContext(AppModule, {
-        logger: ['warn', 'error'], // only errors
-    });
-
-    try {
-        await app.select(CommandModule).get(CommandService).exec();
-    } catch (error) {
-        console.error(error); // eslint-disable-line no-console
-    }
-
-    await app.close();
+@Module({
+    ...baseConfig,
+    module: (config: IConsoleAppModuleConfig) => {
+        const module = baseConfig.module(config);
+        return {
+            ...module,
+            imports: [
+                ...module.imports,
+                AuthModule,
+                FileModule,
+                UserModule,
+                NotifierModule,
+                InitModule,
+            ],
+        };
+    },
+})
+export class AppModule {
 }
 
-bootstrap();
+(new ConsoleApplication()).start();

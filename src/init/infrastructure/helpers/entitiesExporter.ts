@@ -1,6 +1,6 @@
-import {getFieldOptions, getMetaFields} from '@steroidsjs/nest/src/infrastructure/decorators/fields/BaseField';
+import {getFieldOptions, getMetaFields} from '@steroidsjs/nest/infrastructure/decorators/fields/BaseField';
 import {DECORATORS} from '@nestjs/swagger/dist/constants';
-import {IRelationFieldOptions} from '@steroidsjs/nest/src/infrastructure/decorators/fields/RelationField';
+import {IRelationFieldOptions} from '@steroidsjs/nest/infrastructure/decorators/fields/RelationField';
 
 interface IFieldData {
     attribute: any;

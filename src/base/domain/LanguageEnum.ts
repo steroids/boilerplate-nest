@@ -1,4 +1,4 @@
-import BaseEnum from '@steroidsjs/nest/src/domain/base/BaseEnum';
+import BaseEnum from '@steroidsjs/nest/domain/base/BaseEnum';
 
 export enum BaseLanguageEnum {
     EN = 'en',

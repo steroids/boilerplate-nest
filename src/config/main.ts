@@ -1,7 +1,7 @@
 import {join} from 'path';
 import * as fs from 'node:fs';
-import {DatabaseNamingStrategy} from '@steroidsjs/nest/src/infrastructure/base/DatabaseNamingStrategy';
-import {PostgresConnectionOptions} from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import {DatabaseNamingStrategy} from '@steroidsjs/nest/infrastructure/base/DatabaseNamingStrategy';
+import { PostgresConnectionOptions } from '@steroidsjs/typeorm/driver/postgres/PostgresConnectionOptions';
 
 const moduleNames = fs.readdirSync(join(__dirname, '..'));
 const isMigrateCommand = !!(process.argv || []).find(arg => /^migrate/.exec(arg));

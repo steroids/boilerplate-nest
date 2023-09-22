@@ -1,7 +1,7 @@
 import {ExceptionFilter, Catch, ArgumentsHost, HttpStatus} from '@nestjs/common';
 import { Response } from 'express';
 import {ValidationError} from 'class-validator';
-import {ValidationException} from '@steroidsjs/nest/src/usecases/exceptions/ValidationException';
+import {ValidationException} from '@steroidsjs/nest/usecases/exceptions/ValidationException';
 
 type ErrorsCompositeObject = {
     [propertyName: string]: string[] | ErrorsCompositeObject,

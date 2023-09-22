@@ -1,120 +1,78 @@
-import {NestFactory, Reflector} from '@nestjs/core';
-import {DocumentBuilder, SwaggerDocumentOptions, SwaggerModule} from '@nestjs/swagger';
-import {ConfigService} from '@nestjs/config';
-import {VersioningType} from '@nestjs/common';
-import {CreateDtoPipe} from '@steroidsjs/nest/src/infrastructure/pipes/CreateDtoPipe';
-import './envInit';
-import {ValidationExceptionFilter} from '@steroidsjs/nest/src/infrastructure/filters/ValidationExceptionFilter';
-import {UserExceptionFilter} from '@steroidsjs/nest/src/infrastructure/filters/UserExceptionFilter';
-import * as basicAuth from 'express-basic-auth';
-import {AppModule} from './AppModule';
-import {JwtAuthGuard} from './auth/infrastructure/guards/JwtAuthGuard';
-import {ISessionService} from './auth/domain/interfaces/ISessionService';
-import {AuthService} from './auth/domain/services/AuthService';
-import {SentryExceptionFilter} from './SentryExceptionFilter';
-import {SchemaSerializer} from './SchemaSerializer';
+import {RestApplication} from '@steroidsjs/nest/infrastructure/applications/rest/RestApplication';
+import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
+import baseConfig from '@steroidsjs/nest/infrastructure/applications/rest/config';
+import {IRestAppModuleConfig} from '@steroidsjs/nest/infrastructure/applications/rest/IRestAppModuleConfig';
+import {UserModule} from './user/infrastructure/UserModule';
+import {AuthModule} from './auth/infrastructure/AuthModule';
+import {FileModule} from './file/infrastructure/FileModule';
+import {NotifierModule} from './notifier/infrastructure/NotifierModule';
+import {InitModule} from './init/infrastructure/InitModule';
 
-async function bootstrap() {
-    const app = await NestFactory.create(AppModule);
-    const configService = app.get(ConfigService);
+@Module({
+    ...baseConfig,
+    config: () => {
+        const config: IRestAppModuleConfig = baseConfig.config();
 
-    // Versioning
-    app.setGlobalPrefix('/api/v1');
-    app.enableVersioning({
-        type: VersioningType.URI,
-    });
+        return {
+            ...config,
+            name: 'boilerplatenest12345',
+            title: 'Boilerplate-Nest-12345',
+            cors: {
+                ...config?.cors,
+                allowHeaders: [
+                    'Origin',
+                    'X-Requested-With',
+                    'Content-Type',
+                    'Accept',
+                    'Authorization',
+                    'X-CSRF-Token',
 
-    // Swagger config
-    if (process.env.SWAGGER_URL) {
-        const swaggerConfig = new DocumentBuilder()
-            .setTitle(configService.get('title') || 'Application')
-            .setDescription('Документация REST API')
-            .setVersion(configService.get('version') || '1.0')
-            .addBearerAuth()
-            .build();
-
-        const swaggerOptions:SwaggerDocumentOptions = {
-            ignoreGlobalPrefix: false,
+                    // For file PUT upload
+                    'If-None-Match',
+                    'If-Modified-Since',
+                    'Cache-Control',
+                    'X-Requested-With',
+                    'Content-Disposition',
+                    'Content-Range',
+                    'Book-Slug',
+                ],
+                allowDomains: [
+                    '127.0.0.1:9996',
+                    '127.0.0.1:9997',
+                ],
+            },
+            auth: {
+                jwtAccessSecretKey: process.env.AUTH_JWT_ACCESS_SECRET_KEY || (process.env.AUTH_JWT_SECRET_KEY + 'a'),
+                jwtRefreshSecretKey: process.env.AUTH_JWT_REFRESH_SECRET_KEY || (process.env.AUTH_JWT_SECRET_KEY + 'r'),
+                accessTokenExpiresSec: '7h',
+                refreshTokenExpiresSec: '30d',
+            },
+            database: {
+                ...config.database,
+                // Раскомментировать для отладки
+                // logging: ['schema', 'warn', 'error', 'migration'/*, 'query'/**/],
+            },
+            sentry: {
+                dsn: process.env.APP_SENTRY_DSN,
+                environment: process.env.APP_ENVIRONMENT,
+            },
+        } as IRestAppModuleConfig;
+    },
+    module: (config: IRestAppModuleConfig) => {
+        const module = baseConfig.module(config);
+        return {
+            ...module,
+            imports: [
+                AuthModule,
+                UserModule,
+                FileModule,
+                NotifierModule,
+                InitModule,
+                ...module.imports,
+            ],
         };
+    },
+})
+export class AppModule {}
 
-        const document = SwaggerModule.createDocument(app, swaggerConfig, swaggerOptions);
-
-        // turn on basic auth to access swagger
-        if (process.env.SWAGGER_PASSWORD) {
-            app.use(
-                [process.env.SWAGGER_URL],
-                basicAuth({
-                    challenge: true,
-                    users: {
-                        [process.env.SWAGGER_USER]: process.env.SWAGGER_PASSWORD,
-                    },
-                }),
-            );
-        }
-
-        SwaggerModule.setup(process.env.SWAGGER_URL, app, document);
-    }
-
-    // Cors
-    const origin = [];
-    (configService.get('cors.allowDomains') || []).forEach(domain => {
-        if (domain.indexOf('://') !== -1) {
-            origin.push(domain);
-        } else {
-            origin.push('https://' + domain);
-            origin.push('http://' + domain);
-        }
-    });
-    app.enableCors({
-        credentials: true,
-        origin,
-        methods: (configService.get('cors.allowMethods') || [
-            'POST',
-            'PUT',
-            'GET',
-            'OPTIONS',
-            'DELETE',
-        ]),
-        allowedHeaders: configService.get('cors.allowHeaders') || [
-            'Origin',
-            'X-Requested-With',
-            'Content-Type',
-            'Accept',
-            'Authorization',
-            'X-CSRF-Token',
-
-            // For file PUT upload
-            'If-None-Match',
-            'If-Modified-Since',
-            'Cache-Control',
-            'X-Requested-With',
-            'Content-Disposition',
-            'Content-Range',
-        ],
-    });
-
-    // Validation
-    app.useGlobalPipes(new CreateDtoPipe());
-    app.useGlobalFilters(new ValidationExceptionFilter());
-    app.useGlobalFilters(new UserExceptionFilter());
-
-    if (process.env.APP_SENTRY_DSN) {
-        app.useGlobalFilters(new SentryExceptionFilter());
-    }
-
-    app.useGlobalInterceptors(
-        new SchemaSerializer(app.get(Reflector)),
-    );
-
-    // Guards
-    app.useGlobalGuards(new JwtAuthGuard(app.get(ISessionService), app.get(AuthService)));
-
-    // Start application
-    const port = configService.get('port');
-    await app.listen(
-        port,
-        () => console.log(`Server started http://localhost:${port}`), // eslint-disable-line no-console
-    );
-}
-
-bootstrap();
+(new RestApplication()).start();

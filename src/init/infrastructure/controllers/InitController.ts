@@ -1,19 +1,19 @@
-import {Body, Controller, Post} from '@nestjs/common';
+import {Body, Controller, Inject, Post} from '@nestjs/common';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
-import {ContextDto} from '@steroidsjs/nest/src/usecases/dtos/ContextDto';
-import {Context} from '@steroidsjs/nest/src/infrastructure/decorators/Context';
+import {ContextDto} from '@steroidsjs/nest/usecases/dtos/ContextDto';
+import {Context} from '@steroidsjs/nest/infrastructure/decorators/Context';
+import {IUserService} from '@steroidsjs/nest-modules/user/services/IUserService';
 import {AuthInitSchema} from '../schemas/AuthInitSchema';
-import {UserService} from '../../../user/domain/services/UserService';
 import getExportedEnums from '../helpers/getExportedEnums';
-import getExportedModels from '../helpers/getExportedModels';
 import {InitRequestDto} from '../../usecases/dtos/InitRequestDto';
-import {exportEnums, exportModels} from '../helpers/entitiesExporter';
+import {exportEnums} from '../helpers/entitiesExporter';
 
 @ApiTags('Авторизация')
 @Controller('/init')
 export class InitController {
     constructor(
-        private userService: UserService,
+        @Inject(IUserService)
+        private userService: IUserService,
     ) {}
 
     @Post()

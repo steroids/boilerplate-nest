@@ -1,92 +1,64 @@
-import {Module} from '@nestjs/common';
-import {TypeOrmModule} from '@nestjs/typeorm';
-import {ModuleHelper} from '@steroidsjs/nest/src/infrastructure/helpers/ModuleHelper';
+import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
+import coreModule from '@steroidsjs/nest-notifier';
 import {MailerModule} from '@nestjs-modules/mailer';
 import {PugAdapter} from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
-import {ConfigModule, ConfigService} from '@nestjs/config';
-import {INotifierMessageRepository} from '../domain/interfaces/INotifierMessageRepository';
-import {NotifierMessageRepository} from './repositories/NotifierMessageRepository';
-import {NotifierService} from '../domain/services/NotifierService';
-import {StoreProvider} from '../domain/providers/StoreProvider';
-import {MailProvider} from '../domain/providers/MailProvider';
-import {SmsRuSmsProvider} from '../domain/providers/SmsRuSmsProvider';
-import {IMailService} from '../domain/interfaces/IMailService';
-import MailService from './services/MailService';
-import NotifierStoreService from '../domain/services/NotifierStoreService';
-import {SmsRuCallProvider} from '../domain/providers/SmsRuCallProvider';
-import {SmscCallProvider} from '../domain/providers/SmscCallProvider';
-import {SmscSmsProvider} from '../domain/providers/SmscSmsProvider';
-import {SmscVoiceMessageProvider} from '../domain/providers/SmscVoiceMessageProvider';
-
-const mailPort = process.env.MAIL_PORT;
-const mailProtocol = process.env.MAIL_PROTOCOL;
-const mailHost = process.env.MAIL_HOST;
-const mailUser = process.env.MAIL_USER;
+import {INotifierService} from '@steroidsjs/nest-modules/notifier/services/INotifierService';
+import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper';
+import {NotifierService} from '@steroidsjs/nest-notifier/domain/services/NotifierService';
+import {MailProvider} from '@steroidsjs/nest-notifier/domain/providers/MailProvider';
+import {IMailService} from '@steroidsjs/nest-notifier/domain/interfaces/IMailService';
+import MailService from '@steroidsjs/nest-notifier/infrastructure/services/MailService';
 
 @Module({
-    imports: [
-        ConfigModule,
-        TypeOrmModule.forFeature(ModuleHelper.importDir(`${__dirname}/tables`)),
-        MailerModule.forRoot({
-            transport: `${mailProtocol}://${mailUser}@${mailHost}:${mailPort}`,
-            defaults: {
-                from: '"nest-modules" <modules@nestjs.com>',
-            },
-            template: {
-                dir: `${__dirname}/templates`,
-                adapter: new PugAdapter(),
-                options: {
-                    strict: true,
+    ...coreModule,
+    module: () => ({
+        imports: [
+            MailerModule.forRoot({
+                transport: {
+                    host: process.env.MAIL_HOST,
+                    port: parseInt(process.env.MAIL_PORT, 10),
+                    secure: true,
+                    auth: {
+                        user: process.env.MAIL_SENDER,
+                        pass: process.env.MAIL_PASSWORD,
+                    },
                 },
+                defaults: {
+                    from: process.env.MAIL_SENDER,
+                },
+                template: {
+                    dir: `${__dirname}/templates`,
+                    adapter: new PugAdapter(),
+                    options: {
+                        strict: true,
+                    },
+                },
+            }),
+        ],
+        providers: [
+
+            {
+                provide: IMailService,
+                useClass: MailService,
             },
-        }),
-    ],
-    providers: [
-        {
-            provide: INotifierMessageRepository,
-            useClass: NotifierMessageRepository,
-        },
-        {
-            provide: IMailService,
-            useClass: MailService,
-        },
-        ModuleHelper.provide(NotifierStoreService, [
-            INotifierMessageRepository,
-        ]),
-        ModuleHelper.provide(StoreProvider, [
-            NotifierStoreService,
-        ]),
-        ModuleHelper.provide(SmsRuCallProvider, [
-            ConfigService,
-        ]),
-        ModuleHelper.provide(SmsRuSmsProvider, [
-            ConfigService,
-        ]),
-        ModuleHelper.provide(SmscCallProvider, [
-            ConfigService,
-        ]),
-        ModuleHelper.provide(SmscVoiceMessageProvider, [
-            ConfigService,
-        ]),
-        ModuleHelper.provide(SmscSmsProvider, [
-            ConfigService,
-        ]),
-        ModuleHelper.provide(MailProvider, [
-            IMailService,
-        ]),
-        ModuleHelper.provide(NotifierService, [
-            StoreProvider,
-            MailProvider,
-            SmsRuSmsProvider,
-            SmsRuCallProvider,
-            SmscSmsProvider,
-            SmscCallProvider,
-            SmscVoiceMessageProvider,
-        ]),
-    ],
-    exports: [
-        NotifierService,
-    ],
+            {
+                provide: MailProvider,
+                useClass: MailProvider,
+            },
+            {
+                inject: [IMailService],
+                provide: MailProvider,
+                useFactory: (mailService) => new MailProvider(mailService),
+            },
+            ModuleHelper.provide(NotifierService, INotifierService, [
+                [
+                    MailProvider,
+                ],
+            ]),
+        ],
+        exports: [
+            INotifierService,
+        ],
+    }),
 })
-export class NotifierModule {
-}
+export class NotifierModule { }
