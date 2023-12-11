@@ -14,7 +14,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "cli": "npx nestjs-command"
+    "cli": "npx nestjs-command",
+    "migrate:deploy": "CLI_PATH=./dist/cli.js bash -c 'npx nestjs-command migrate'"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
