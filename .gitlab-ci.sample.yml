@@ -4,7 +4,7 @@ stages:
 
 variables:
   DEV_DEPLOY_DIR: '/var/www/boilerplatenest12345/www-master'
-  EXCLUDE_DIRS: '.git .idea'
+  EXCLUDE_DIRS: '.git .idea /src'
 
 .build:
   stage: build
@@ -41,5 +41,5 @@ deploy_dev:
     - ssh root@dev "cd $DEV_DEPLOY_DIR
       && ln -sf ../config/.env
       && ln -s ../files
-      && CLI_PATH=./dist/cli.js bash -c 'npx nestjs-command migrate'
+      && yarn migrate:deploy
       && pm2 reload boilerplatenest12345"
