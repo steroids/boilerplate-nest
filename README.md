@@ -25,12 +25,16 @@ yarn
 
 ### 2. Настройка базы данных
 
-Пример создание пользователя и базы данных для проекта
+Пример создания пользователя и базы данных для проекта
 
+1. Создание пользователя и БД
 ```shell
-psql postgres -c "CREATE USER \"boilerplatenest12345_admin\" WITH ENCRYPTED PASSWORD '123';"
-psql postgres -c "CREATE DATABASE \"boilerplatenest12345\";"
-psql postgres -c "GRANT ALL PRIVILEGES ON DATABASE \"boilerplatenest12345\" TO \"boilerplatenest12345_admin\";"
+su postgres -c "createuser -h postgres boilerplatenest12345_admin && createdb -h postgres boilerplatenest12345"
+```
+
+2. Установка пароля и выдача прав
+```shell
+psql -U postgres -h postgres -c "alter user \"boilerplatenest12345_admin\" with encrypted password '123'; grant all privileges on database \"boilerplatenest12345\" to \"boilerplatenest12345_admin\";"
 ```
 
 ### 3. Настройка окружения через файл с переменными окружения `.env`
