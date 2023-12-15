@@ -1,0 +1,77 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  DEV_DEPLOY_DIR: '/var/host/www/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME'
+#  PROD_DEPLOY_DIR: ''
+
+.build:
+  stage: build
+  cache:
+    paths:
+      - node_modules
+  artifacts:
+    paths:
+      - node_modules
+      - dist
+  script:
+    - yarn install --production
+    - yarn build
+    - echo "$CI_COMMIT_REF_NAME-$CI_JOB_ID" > $CI_PROJECT_DIR/dist/version.txt
+
+build_dev:
+  extends: .build
+  environment: dev
+  variables:
+    APP_ENVIRONMENT: dev
+  only:
+    - master
+
+#build_prod:
+#  extends: .build
+#  environment: production
+#  variables:
+#    APP_ENVIRONMENT: production
+#  only:
+#    - prod
+
+
+.deploy_template:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - mkdir -p $DEPLOY_DIR
+    - rsync
+      --recursive
+      --links
+      --remove-source-files
+      --delete
+      ./ $DEPLOY_DIR
+    - cd $DEPLOY_DIR
+    - ln -s ../config/.env ./dist/.env
+    - ln -s ../config/.env ./.env
+    - ln -s ../files
+#    - yarn migrate:deploy
+#    - pm2 reload boilerplatenest12345
+
+deploy_dev:
+  extends: .deploy_template
+  environment: dev
+  tags:
+    - dev-server
+  variables:
+    DEPLOY_DIR: $DEV_DEPLOY_DIR
+  only:
+    - master
+
+#deploy_prod:
+#  extends: .deploy_template
+#  environment: production
+#  tags:
+#    - dev-server
+#  variables:
+#    DEPLOY_DIR: $PROD_DEPLOY_DIR
+#  only:
+#    - prod
