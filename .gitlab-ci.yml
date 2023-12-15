@@ -4,7 +4,9 @@ stages:
 
 variables:
   DEV_DEPLOY_DIR: '/var/host/www/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME'
-#  PROD_DEPLOY_DIR: ''
+#  PROD_DEPLOY_DIR: '[prod deploy root dir]'
+
+# Build stage
 
 .build:
   stage: build
@@ -37,41 +39,53 @@ build_dev:
 #    - prod
 
 
-.deploy_template:
+# Deploy stage
+
+deploy_dev:
+  environment: dev
+  tags:
+    - dev-server
+  only:
+    - master
   stage: deploy
   variables:
     GIT_STRATEGY: none
   script:
-    - mkdir -p $DEPLOY_DIR
+    - mkdir -p $DEV_DEPLOY_DIR
     - rsync
       --recursive
       --links
       --remove-source-files
       --delete
-      ./ $DEPLOY_DIR
-    - cd $DEPLOY_DIR
+      ./ $DEV_DEPLOY_DIR
+    - cd $DEV_DEPLOY_DIR
     - ln -s ../config/.env ./dist/.env
     - ln -s ../config/.env ./.env
     - ln -s ../files
 #    - yarn migrate:deploy
 #    - pm2 reload boilerplatenest12345
 
-deploy_dev:
-  extends: .deploy_template
-  environment: dev
-  tags:
-    - dev-server
-  variables:
-    DEPLOY_DIR: $DEV_DEPLOY_DIR
-  only:
-    - master
-
 #deploy_prod:
-#  extends: .deploy_template
 #  environment: production
 #  tags:
-#    - dev-server
-#  variables:
-#    DEPLOY_DIR: $PROD_DEPLOY_DIR
+#    - [production gitlab runner tag]
 #  only:
 #    - prod
+#  stage: deploy
+#  variables:
+#    GIT_STRATEGY: none
+#    CURRENT_DIR: $PROD_DEPLOY_DIR/current
+#    PREVIOUS_DIR: $PROD_DEPLOY_DIR/previous
+#    DEPLOY_DIR: $PROD_DEPLOY_DIR/$CI_PIPELINE_ID
+#  script:
+#    - mkdir -p $DEPLOY_DIR
+#    - rsync --recursive --remove-source-files --delete ./ $DEPLOY_DIR
+#    - rm -rf $(readlink -f $PREVIOUS_DIR) $PREVIOUS_DIR
+#    - if [ -d "$CURRENT_DIR" ]; then mv $CURRENT_DIR $PREVIOUS_DIR; fi
+#    - ln -s $DEPLOY_DIR $CURRENT_DIR
+#    - cd $DEPLOY_DIR
+#    - ln -s ../config/.env ./dist/.env
+#    - ln -s ../config/.env ./.env
+#    - ln -s ../files
+#    - yarn migrate:deploy
+#    - pm2 reload boilerplatenest12345
