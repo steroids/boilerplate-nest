@@ -34,7 +34,6 @@ import {InitModule} from './init/infrastructure/InitModule';
                     'X-Requested-With',
                     'Content-Disposition',
                     'Content-Range',
-                    'Book-Slug',
                 ],
                 allowDomains: [
                     '127.0.0.1:9996',
