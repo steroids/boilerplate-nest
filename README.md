@@ -43,7 +43,13 @@ psql -U postgres -h postgres -c "alter user \"boilerplatenest12345_admin\" with 
 2. Исправить параметры по-умолчанию в файле `.env`
 3. Сгенерировать уникальные строки и установить их для `AUTH_JWT_ACCESS_SECRET_KEY` и `AUTH_JWT_REFRESH_SECRET_KEY`
 
-### 4. Запуск миграций БД
+### 4. Добавить допустимые для CORS домены
+
+В `src/main.ts` для конфигурации `IRestAppModuleConfig` в массив `cors.allowDomains` добавить домены, которые будут
+иметь возможность совершать cross-origin запросы. Обычно это нужно для разработки, и указываются там домены
+frontend, frontend-admin и других сервисов.
+
+### 5. Запуск миграций БД
 
 1. Создать миграции
 ```shell

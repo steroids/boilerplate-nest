@@ -36,8 +36,6 @@ import {InitModule} from './init/infrastructure/InitModule';
                     'Content-Range',
                 ],
                 allowDomains: [
-                    '127.0.0.1:9996',
-                    '127.0.0.1:9997',
                 ],
             },
             auth: {
