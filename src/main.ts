@@ -7,6 +7,7 @@ import {AuthModule} from './auth/infrastructure/AuthModule';
 import {FileModule} from './file/infrastructure/FileModule';
 import {NotifierModule} from './notifier/infrastructure/NotifierModule';
 import {InitModule} from './init/infrastructure/InitModule';
+import {MetricsModule} from './metrics/infrastructure/MetricsModule';
 
 const appModuleConfig = {
     ...baseConfig,
@@ -65,8 +66,9 @@ const appModuleConfig = {
                 FileModule,
                 NotifierModule,
                 InitModule,
+                process.env.APP_METRICS_TOKEN ? MetricsModule : null,
                 ...module.imports,
-            ],
+            ].filter(Boolean),
         };
     },
 };

@@ -34,12 +34,14 @@
     "@steroidsjs/nest-typeorm": "^10.0.3",
     "@steroidsjs/nest-user": "^0.0.13",
     "@steroidsjs/typeorm": "^0.3.23",
+    "@willsoto/nestjs-prometheus": "^6.0.0",
     "cache-manager": "^5.2.3",
     "class-validator": "^0.14.0",
     "date-fns": "^2.29.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.1",
     "lodash": "^4.17.21",
+    "prom-client": "^15.1.1",
     "rxjs": "^7.8.0"
   },
   "devDependencies": {
