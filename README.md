@@ -95,6 +95,8 @@ yarn start:prod
 Приложение может отдавать [стандартные метрики NodeJS](https://github.com/siimon/prom-client?tab=readme-ov-file#default-metrics)
 в формате Prometheus. Метрики отдаются по адресу `GET /api/v1/metrics`.
 
+В Grafana просматривать метрики можно на [NodeJS Application Dashboard](https://grafana.com/grafana/dashboards/11159-nodejs-application-dashboard/)
+
 Доступ к эндпоинту защищен токеном. Для того чтобы включить отдачу метрик, необходимо добавить переменную окружения
 `APP_METRICS_TOKEN` с уникальной сгенерированной строкой. В дальнейшем эту же строку нужно использовать при
 конфигурации Prometheus для получения метрик с приложения.
