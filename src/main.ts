@@ -8,7 +8,7 @@ import {FileModule} from './file/infrastructure/FileModule';
 import {NotifierModule} from './notifier/infrastructure/NotifierModule';
 import {InitModule} from './init/infrastructure/InitModule';
 
-@Module({
+const appModuleConfig = {
     ...baseConfig,
     config: () => {
         const config: IRestAppModuleConfig = baseConfig.config();
@@ -69,7 +69,8 @@ import {InitModule} from './init/infrastructure/InitModule';
             ],
         };
     },
-})
-export class AppModule {}
+};
+
+Module(appModuleConfig)(null);
 
 (new RestApplication()).start();
