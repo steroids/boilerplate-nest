@@ -101,6 +101,17 @@ yarn start:prod
 `APP_METRICS_TOKEN` с уникальной сгенерированной строкой. В дальнейшем эту же строку нужно использовать при
 конфигурации Prometheus для получения метрик с приложения.
 
+Пример конфигурации Prometheus для получения метрик, с учетом того, что Prometheus в Docker, NodeJS приложение
+работает на порту 9360 в хост системе, а ключ `APP_METRICS_TOKEN` равен `vXsNqGs3VvGQ5eA8fDfu`:
+```yaml
+  - job_name: 'nodejs-app'
+    metrics_path: '/api/v1/metrics'
+    authorization:
+        credentials: 'vXsNqGs3VvGQ5eA8fDfu'
+    static_configs:
+      - targets: ['host.docker.internal:9360']
+```
+
 ## Выгрузка и запуск на сервере
 
 ### Настройка выгрузки на dev 
