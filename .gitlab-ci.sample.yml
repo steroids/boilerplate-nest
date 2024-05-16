@@ -17,6 +17,7 @@ variables:
     paths:
       - node_modules
       - dist
+      - package.json
   script:
     - yarn install --production
     - yarn build
