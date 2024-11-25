@@ -10,7 +10,7 @@ type ErrorsCompositeObject = {
 // @todo переделать на наследование существующего ValidationExceptionFilter
 @Catch(ValidationException)
 export class ValidationExceptionFilterCustom implements ExceptionFilter {
-    async parseErrors(errors, contextLanguage: string): Promise<ErrorsCompositeObject> {
+    async parseErrors(errors: any, contextLanguage: string): Promise<ErrorsCompositeObject> {
         if (!Array.isArray(errors)) {
             return errors;
         }
@@ -19,7 +19,7 @@ export class ValidationExceptionFilterCustom implements ExceptionFilter {
             .filter(error => error instanceof ValidationError)
             .reduce(
                 async (result: any, error: ValidationError): Promise<ErrorsCompositeObject> => {
-                    if (error.children?.length > 0) {
+                    if (error.children && error.children.length > 0) {
                         result[error.property] = this.parseErrors(error.children, contextLanguage);
                         return result;
                     }

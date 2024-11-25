@@ -1,7 +1,8 @@
 import {RestApplication} from '@steroidsjs/nest/infrastructure/applications/rest/RestApplication';
-import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
+import {IModule, Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
 import baseConfig from '@steroidsjs/nest/infrastructure/applications/rest/config';
 import {IRestAppModuleConfig} from '@steroidsjs/nest/infrastructure/applications/rest/IRestAppModuleConfig';
+import {ModuleMetadata} from '@nestjs/common';
 import {UserModule} from './user/infrastructure/UserModule';
 import {AuthModule} from './auth/infrastructure/AuthModule';
 import {FileModule} from './file/infrastructure/FileModule';
@@ -9,7 +10,7 @@ import {NotifierModule} from './notifier/infrastructure/NotifierModule';
 import {InitModule} from './init/infrastructure/InitModule';
 import {MetricsModule} from './metrics/infrastructure/MetricsModule';
 
-const appModuleConfig = {
+const appModuleConfig: IModule = {
     ...baseConfig,
     config: () => {
         const config: IRestAppModuleConfig = baseConfig.config();
@@ -69,7 +70,7 @@ const appModuleConfig = {
                 process.env.APP_METRICS_TOKEN ? MetricsModule : null,
                 ...module.imports,
             ].filter(Boolean),
-        };
+        } as ModuleMetadata;
     },
 };
 

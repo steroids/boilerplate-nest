@@ -8,21 +8,24 @@ import {join} from 'path';
 @Module({
     ...coreModule,
     tables: [
-        ...coreModule.tables,
+        ...(coreModule.tables ?? []),
         ...ModuleHelper.importDir(join(__dirname, '/tables')),
     ],
     module: (config: IAuthModuleConfig) => {
-        const module = coreModule.module(config);
+        if (!coreModule.module) {
+            throw new Error('coreModule.module is not defined');
+        }
+        const module = coreModule?.module(config);
         return {
             ...module,
             imports: [
-                ...module.imports,
+                ...(module.imports ?? []),
             ],
             controllers: [
-                ...module.controllers.filter(controller => controller !== BaseAuthController),
+                ...(module?.controllers ? module.controllers.filter(controller => controller !== BaseAuthController) : []),
             ],
             providers: [
-                ...module.providers,
+                ...(module.providers ?? []),
             ],
         };
     },
