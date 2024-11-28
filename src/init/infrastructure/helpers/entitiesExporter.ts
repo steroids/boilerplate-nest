@@ -1,6 +1,7 @@
 import {getFieldOptions, getMetaFields} from '@steroidsjs/nest/infrastructure/decorators/fields/BaseField';
 import {DECORATORS} from '@nestjs/swagger/dist/constants';
 import {IRelationFieldOptions} from '@steroidsjs/nest/infrastructure/decorators/fields/RelationField';
+import BaseEnum from '@steroidsjs/nest/domain/base/BaseEnum';
 
 interface IFieldData {
     attribute: any,
@@ -11,7 +12,7 @@ interface IFieldData {
     modelClass?: string,
 }
 
-function exportEnum(enumClass: any) {
+function exportEnum(enumClass: typeof BaseEnum) {
     const labels = enumClass
         .toArray()
         .map((enumElement: {id: string, label: string,}) => ({
@@ -53,7 +54,7 @@ function exportModel(modelClass: any) {
     };
 }
 
-export function exportEnums(enums: any[]) {
+export function exportEnums(enums: typeof BaseEnum[]) {
     const arrayableEnums = enums.filter(type => type.toArray);
 
     const result: {[key: string] : {labels: any,},} = {};

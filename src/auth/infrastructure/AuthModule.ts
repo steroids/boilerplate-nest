@@ -15,14 +15,14 @@ import {join} from 'path';
         if (!coreModule.module) {
             throw new Error('coreModule.module is not defined');
         }
-        const module = coreModule?.module(config);
+        const module = coreModule.module(config);
         return {
             ...module,
             imports: [
                 ...(module.imports ?? []),
             ],
             controllers: [
-                ...(module?.controllers ? module.controllers.filter(controller => controller !== BaseAuthController) : []),
+                ...(module.controllers ? module.controllers.filter(controller => controller !== BaseAuthController) : []),
             ],
             providers: [
                 ...(module.providers ?? []),

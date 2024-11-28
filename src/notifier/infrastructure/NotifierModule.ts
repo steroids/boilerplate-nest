@@ -16,7 +16,7 @@ import MailService from '@steroidsjs/nest-notifier/infrastructure/services/MailS
             MailerModule.forRoot({
                 transport: {
                     host: process.env.MAIL_HOST,
-                    port: parseInt(process.env.MAIL_PORT ?? '0', 10),
+                    port: parseInt(process.env.MAIL_PORT ?? '465', 10),
                     secure: true,
                     auth: {
                         user: process.env.MAIL_SENDER,
