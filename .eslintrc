@@ -1,16 +1,11 @@
 {
     "extends": [
-        "@steroidsjs/eslint-config"
+        "@steroidsjs/eslint-config/backend"
     ],
     "rules": {
-        "import/prefer-default-export": "off",
-        "no-useless-constructor": "off",
-        "class-methods-use-this": "off",
-        "no-await-in-loop": "off",
-        "linebreak-style": "off",
-        "no-restricted-syntax": "off"
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": ["**/*.test.ts"] }]
     },
-    "env": {
-        "node": true
-    }
+    "ignorePatterns": [
+        "src/**/migrations/*.ts"
+    ]
 }
