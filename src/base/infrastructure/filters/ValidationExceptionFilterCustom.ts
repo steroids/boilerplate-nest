@@ -7,13 +7,13 @@ import {IErrorsCompositeObject} from '@steroidsjs/nest/usecases/interfaces/IErro
 // @todo переделать на наследование существующего ValidationExceptionFilter
 @Catch(ValidationException)
 export class ValidationExceptionFilterCustom implements ExceptionFilter {
-    async parseErrors(errors: IErrorsCompositeObject | ValidationError[], contextLanguage: string): Promise<IErrorsCompositeObject> {
+    parseErrors(errors: IErrorsCompositeObject | ValidationError[], contextLanguage: string): IErrorsCompositeObject {
         if (!Array.isArray(errors)) {
             return errors;
         }
 
         return errors.reduce(
-            async (result: any, error: ValidationError): Promise<IErrorsCompositeObject> => {
+            (result: any, error: ValidationError): IErrorsCompositeObject => {
                 if (error.children && error.children.length > 0) {
                     result[error.property] = this.parseErrors(error.children, contextLanguage);
                     return result;
@@ -31,10 +31,10 @@ export class ValidationExceptionFilterCustom implements ExceptionFilter {
         );
     }
 
-    async catch(exception: ValidationException, host: ArgumentsHost) {
+    catch(exception: ValidationException, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const errors = await this.parseErrors(exception.errors, ctx.getRequest().i18nLang);
+        const errors = this.parseErrors(exception.errors, ctx.getRequest().i18nLang);
 
         response
             .status(HttpStatus.OK)
