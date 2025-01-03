@@ -85,8 +85,8 @@ deploy_dev:
 #    - if [ -d "$CURRENT_DIR" ]; then mv $CURRENT_DIR $PREVIOUS_DIR; fi
 #    - ln -s $DEPLOY_DIR $CURRENT_DIR
 #    - cd $DEPLOY_DIR
-#    - ln -s ../../config/.env ./dist/backend.env
-#    - ln -s ../../config/.env ./backend.env
+#    - ln -s ../../../config/backend.env ./dist/.env
+#    - ln -s ../../config/backend.env ./.env
 #    - ln -s ../files
-#    - yarn migrate:deploy
+#    - npm run migrate:deploy
 #    - pm2 reload boilerplatenest12345
