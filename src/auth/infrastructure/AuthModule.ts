@@ -22,7 +22,7 @@ import {join} from 'path';
                 ...(module.imports ?? []),
             ],
             controllers: [
-                ...(module.controllers ? module.controllers.filter(controller => controller !== BaseAuthController) : []),
+                ...(module.controllers ?? []).filter(controller => controller !== BaseAuthController),
             ],
             providers: [
                 ...(module.providers ?? []),

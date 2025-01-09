@@ -9,6 +9,8 @@ import {MailProvider} from '@steroidsjs/nest-notifier/domain/providers/MailProvi
 import {IMailService} from '@steroidsjs/nest-notifier/domain/interfaces/IMailService';
 import MailService from '@steroidsjs/nest-notifier/infrastructure/services/MailService';
 
+const DEFAULT_MAIL_PORT = '465';
+
 @Module({
     ...coreModule,
     module: () => ({
@@ -16,7 +18,7 @@ import MailService from '@steroidsjs/nest-notifier/infrastructure/services/MailS
             MailerModule.forRoot({
                 transport: {
                     host: process.env.MAIL_HOST,
-                    port: parseInt(process.env.MAIL_PORT ?? '465', 10),
+                    port: parseInt(process.env.MAIL_PORT ?? DEFAULT_MAIL_PORT, 10),
                     secure: true,
                     auth: {
                         user: process.env.MAIL_SENDER,
