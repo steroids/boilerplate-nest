@@ -8,20 +8,7 @@
         "class-methods-use-this": "off",
         "no-await-in-loop": "off",
         "linebreak-style": "off",
-        "no-restricted-syntax": "off",
-        "@typescript-eslint/member-delimiter-style": [
-            "error",
-            {
-                "multiline": {
-                    "delimiter": "semi",
-                    "requireLast": true
-                },
-                "singleline": {
-                    "delimiter": "comma",
-                    "requireLast": false
-                }
-            }
-        ]
+        "no-restricted-syntax": "off"
     },
     "env": {
         "node": true
