@@ -1,17 +1,18 @@
 import {getFieldOptions, getMetaFields} from '@steroidsjs/nest/infrastructure/decorators/fields/BaseField';
 import {DECORATORS} from '@nestjs/swagger/dist/constants';
 import {IRelationFieldOptions} from '@steroidsjs/nest/infrastructure/decorators/fields/RelationField';
+import BaseEnum from '@steroidsjs/nest/domain/base/BaseEnum';
 
 interface IFieldData {
-    attribute: any;
-    type: string;
-    label: string;
-    required: boolean;
+    attribute: any,
+    type: string,
+    label: string,
+    required: boolean,
     items?: any,
     modelClass?: string,
 }
 
-function exportEnum(enumClass) {
+function exportEnum(enumClass: typeof BaseEnum) {
     const labels = enumClass
         .toArray()
         .map((enumElement: {id: string, label: string}) => ({
@@ -23,7 +24,7 @@ function exportEnum(enumClass) {
     };
 }
 
-function extractModelAttribute(modelClass, fieldName) {
+function extractModelAttribute(modelClass: any, fieldName: string) {
     const apiMeta = Reflect.getMetadata(DECORATORS.API_MODEL_PROPERTIES, modelClass.prototype, fieldName);
     const options = getFieldOptions(modelClass, fieldName);
 
@@ -46,17 +47,17 @@ function extractModelAttribute(modelClass, fieldName) {
     return fieldData;
 }
 
-function exportModel(modelClass) {
+function exportModel(modelClass: any) {
     const fieldNames = getMetaFields(modelClass);
     return {
         attributes: fieldNames.map(fieldName => extractModelAttribute(modelClass, fieldName)),
     };
 }
 
-export function exportEnums(enums: any[]) {
+export function exportEnums(enums: typeof BaseEnum[]) {
     const arrayableEnums = enums.filter(type => type.toArray);
 
-    const result = {};
+    const result: {[key: string]: {labels: any}} = {};
     for (const exportedEnum of arrayableEnums) {
         result[exportedEnum.name] = exportEnum(exportedEnum);
     }
@@ -64,7 +65,7 @@ export function exportEnums(enums: any[]) {
 }
 
 export function exportModels(models: any[]) {
-    const result = {};
+    const result: {[key: string]: {attributes: IFieldData[]}} = {};
     for (const model of models) {
         result[model.name] = exportModel(model);
     }

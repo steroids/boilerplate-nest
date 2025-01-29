@@ -6,21 +6,24 @@ import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper
 @Module({
     ...coreModule,
     tables: [
-        ...coreModule.tables,
+        ...(coreModule.tables ?? []),
         ...ModuleHelper.importDir(__dirname + '/tables'),
     ],
     module: (config: IFileModuleConfig) => {
+        if (!coreModule.module) {
+            throw new Error('coreModule.module is not defined');
+        }
         const module = coreModule.module(config);
         return {
             ...module,
             providers: [
-                ...module.providers,
+                ...(module.providers ?? []),
             ],
             controllers: [
-                ...module.controllers,
+                ...(module.controllers ?? []),
             ],
             exports: [
-                ...module.exports,
+                ...(module.exports ?? []),
             ],
         };
     },
