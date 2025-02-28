@@ -60,7 +60,7 @@ deploy_dev:
       --delete
       ./ $DEV_DEPLOY_DIR
     - cd $DEV_DEPLOY_DIR
-    - ln -s ../config/.env ./dist/.env
+    - ln -s ../../config/.env ./dist/.env
     - ln -s ../config/.env ./.env
     - ln -s ../files
 #    - yarn migrate:deploy
