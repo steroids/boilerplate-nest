@@ -1,6 +1,5 @@
-import {TableFromModel} from '@steroidsjs/nest/infrastructure/decorators/TableFromModel';
-import {IDeepPartial} from '@steroidsjs/nest/usecases/interfaces/IDeepPartial';
 import {UserModel} from '@steroidsjs/nest-user/domain/models/UserModel';
+import {TypeOrmTableFromModel} from '@steroidsjs/nest/infrastructure/decorators/typeorm/TypeOrmTableFromModel';
 
-@TableFromModel(UserModel, 'user')
-export class UserTable implements IDeepPartial<UserModel> {}
+@TypeOrmTableFromModel(UserModel, 'user')
+export class UserTable extends UserModel {}
