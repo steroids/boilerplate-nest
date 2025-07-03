@@ -6,11 +6,13 @@ import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
 import {AuthModule} from '@steroidsjs/nest-modules/auth/AuthModule';
 import {forwardRef} from '@nestjs/common';
 import {IUserService} from '@steroidsjs/nest-modules/user/services/IUserService';
-import {IUserRepository} from '@steroidsjs/nest-user/domain/interfaces/IUserRepository';
-import {UserRepository} from '@steroidsjs/nest/infrastructure/tests/app/repositories/UserRepository';
-import {UserService} from '@steroidsjs/nest-user/domain/services/UserService';
 import {IUserUpdatePasswordUseCase} from '@steroidsjs/nest-modules/user/usecases/IUserUpdatePasswordUseCase';
 import {UserUpdatePasswordUseCase} from '@steroidsjs/nest-user/usecases/userUpdatePassword/UserUpdatePasswordUseCase';
+import {userUseCases} from '../usecases';
+import {UserService} from '../domain/services/UserService';
+import {IUserRepository} from '../domain/interfaces/IUserRepository';
+import {UserCliCommandService} from './UserCliCommandService';
+import {UserRepository} from './repositories/UserRepository';
 
 @Module({
     ...coreModule,
@@ -25,14 +27,15 @@ import {UserUpdatePasswordUseCase} from '@steroidsjs/nest-user/usecases/userUpda
             ],
             providers: [
                 ...module.providers,
+                UserCliCommandService,
+
                 {
                     provide: IUserRepository,
                     useClass: UserRepository,
                 },
                 {
                     provide: IUserService,
-                    inject: [IUserRepository],
-                    useFactory: (userRepository: IUserRepository) => new UserService(userRepository),
+                    useClass: UserService,
                 },
                 {
                     provide: IUserUpdatePasswordUseCase,
@@ -41,6 +44,8 @@ import {UserUpdatePasswordUseCase} from '@steroidsjs/nest-user/usecases/userUpda
                         new UserUpdatePasswordUseCase(userService, sessionService)
                     ),
                 },
+
+                ...userUseCases,
             ],
             exports: [
                 ...module.exports,

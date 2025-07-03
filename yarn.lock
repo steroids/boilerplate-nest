@@ -7417,6 +7417,14 @@ nestjs-command@^3.1.3:
     lodash.compact "^3.0.1"
     lodash.flattendeep "^4.4.0"
 
+nestjs-command@^3.1.5:
+  version "3.1.5"
+  resolved "https://registry.yarnpkg.com/nestjs-command/-/nestjs-command-3.1.5.tgz#52a8923aecb3894bf380f6d58f1a9399c2c43e80"
+  integrity sha512-s1oJNwKvgwivxjbzHAmggnaoPS/0mLaek2d9h93aEjECXHI8NLiJEXG4BTJo9Th61NgIRqkZcNGLXfG3LyrrqQ==
+  dependencies:
+    lodash.compact "^3.0.1"
+    lodash.flattendeep "^4.4.0"
+
 netmask@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"

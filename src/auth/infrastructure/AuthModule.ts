@@ -1,9 +1,11 @@
+import {join} from 'path';
 import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
 import coreModule from '@steroidsjs/nest-auth';
 import {IAuthModuleConfig} from '@steroidsjs/nest-auth/infrastructure/config';
 import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper';
 import {AuthController as BaseAuthController} from '@steroidsjs/nest-auth/infrastructure/controllers/AuthController';
-import {join} from 'path';
+import {authUseCases} from '../usecases';
+import {AuthCliCommandService} from './commands/AuthCliCommandService';
 
 @Module({
     ...coreModule,
@@ -25,7 +27,11 @@ import {join} from 'path';
                 ...(module.controllers ?? []).filter(controller => controller !== BaseAuthController),
             ],
             providers: [
+                AuthCliCommandService,
+
                 ...(module.providers ?? []),
+
+                ...authUseCases,
             ],
         };
     },
