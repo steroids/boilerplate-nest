@@ -32,7 +32,7 @@ export class AuthUpsertAdminRoleUseCase {
     private async getAllPermissions(): Promise<string[]> {
         const tree = await this.authPermissionsService.getPermissionsTree();
 
-        return tree.map(item => this.getFlatPermissions(item)).flat();
+        return tree.flatMap(item => this.getFlatPermissions(item));
     }
 
     private getFlatPermissions(item: any) {
