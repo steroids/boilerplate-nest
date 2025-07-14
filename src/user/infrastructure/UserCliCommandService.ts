@@ -1,4 +1,4 @@
-import * as readline from 'readline';
+import * as readline from 'readline/promises';
 import {Command, Positional} from 'nestjs-command';
 import {Injectable} from '@nestjs/common';
 import {UserCreateAdminUseCase} from 'src/user/usecases/userCreateAdmin/UserCreateAdminUseCase';
@@ -26,12 +26,8 @@ export class UserCliCommandService {
             output: process.stdout,
         });
 
-        const password = await new Promise<string>((resolve) => {
-            rl.question('Введите пароль: ', (answer) => {
-                rl.close();
-                resolve(answer);
-            });
-        });
+        const password = await rl.question('Введите пароль: ');
+        rl.close();
 
         const user = await this.userCreateAdminUseCase.handle(login, password);
         // eslint-disable-next-line no-console
