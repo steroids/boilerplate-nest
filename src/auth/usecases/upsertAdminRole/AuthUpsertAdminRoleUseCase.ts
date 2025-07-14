@@ -39,8 +39,7 @@ export class AuthUpsertAdminRoleUseCase {
         return [
             item.id,
             ...(item.items || [])
-                .map((someItem: any) => this.getFlatPermissions(someItem))
-                .flat(),
+                .flatMap((someItem: any) => this.getFlatPermissions(someItem)),
         ];
     }
 }
