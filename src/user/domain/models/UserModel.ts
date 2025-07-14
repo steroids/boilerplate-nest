@@ -6,7 +6,6 @@ import {
     UpdateTimeField,
     RelationIdField, PrimaryKeyField,
 } from '@steroidsjs/nest/infrastructure/decorators/fields';
-// import {UserModel as BaseUserModel} from '@steroidsjs/nest-user/domain/models/UserModel';
 import {AuthRoleModel} from '@steroidsjs/nest-auth/domain/models/AuthRoleModel';
 
 /**
