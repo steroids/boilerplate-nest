@@ -1,7 +1,7 @@
 {
-  "name": "boilerplatenest12345",
+  "name": "condition-monitoring-integration-service",
   "version": "0.0.1",
-  "description": "Boilerplate-Nest-12345",
+  "description": "integration-service-service",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
@@ -21,7 +21,7 @@
     "migrate:deploy": "CLI_PATH=./dist/cli.js bash -c 'npx nestjs-command migrate'"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=18.20.5"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
