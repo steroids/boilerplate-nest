@@ -17,8 +17,8 @@ const appModuleConfig: IModule = {
 
         return {
             ...config,
-            name: 'condition-monitoring-integration-service',
-            title: 'integration-service',
+            name: 'boilerplatenest12345',
+            title: 'Boilerplate-Nest-12345',
             cors: {
                 ...config?.cors,
                 allowHeaders: [

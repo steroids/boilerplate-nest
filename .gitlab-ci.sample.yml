@@ -64,7 +64,7 @@ deploy_dev:
     - ln -s ../config/.env ./.env
     - ln -s ../files
 #    - yarn migrate:deploy
-#    - pm2 reload condition-monitoring-integration-service
+#    - pm2 reload boilerplatenest12345
 
 #deploy_prod:
 #  environment: production
@@ -89,4 +89,4 @@ deploy_dev:
 #    - ln -s ../../config/backend.env ./.env
 #    - ln -s ../files
 #    - npm run migrate:deploy
-#    - pm2 reload condition-monitoring-integration-service
+#    - pm2 reload boilerplatenest12345

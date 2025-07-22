@@ -1,5 +1,20 @@
 
-# integration-service
+# Boilerplate-Nest-12345
+
+## Развертывание нового приложения на основе boilerplate
+
+### 1. Скопировать в отдельную папку всё содержимое, кроме папки .git
+### 2. Заменить временные строки
+
+Во всем проекте, включая этот файл, заменить (с учетом регистра):
+
+1. Строку `Boilerplate-Nest-12345` на название проекта в человеко-читаемом виде
+2. Строку `boilerplatenest12345` на название проекта в gitlab - для путей в файловой системе, для ссылок и пр.
+
+### 3. Добавить проект в новый репозиторий
+
+### 4. Удалить раздел "Развертывание нового приложения на основе boilerplate" из этого README.md
+
 ## Установка и настройка
 
 ### 1. Установка зависимостей
@@ -14,12 +29,12 @@ yarn
 
 1. Создание пользователя и БД
 ```shell
-su postgres -c "createuser -h postgres condition-monitoring-integration-service_admin && createdb -h postgres condition-monitoring-integration-service"
+su postgres -c "createuser -h postgres boilerplatenest12345_admin && createdb -h postgres boilerplatenest12345"
 ```
 
 2. Установка пароля и выдача прав
 ```shell
-psql -U postgres -h postgres -c "alter user \"condition-monitoring-integration-service_admin\" with encrypted password '123'; grant all privileges on database \"condition-monitoring-integration-service\" to \"condition-monitoring-integration-service_admin\";"
+psql -U postgres -h postgres -c "alter user \"boilerplatenest12345_admin\" with encrypted password '123'; grant all privileges on database \"boilerplatenest12345\" to \"boilerplatenest12345_admin\";"
 ```
 
 ### 3. Настройка окружения через файл с переменными окружения `.env`
@@ -130,7 +145,7 @@ yarn start:prod
 
 1. Запустить команду для добавления конфига проекта в PM2
 ```shell
-pm2 --name=condition-monitoring-integration-service-nest-backend --cwd=/var/www/condition-monitoring-integration-service --log=/var/www/condition-monitoring-integration-service/files/nest-backend-out.log start dist/main.js
+pm2 --name=boilerplatenest12345-nest-backend --cwd=/var/www/boilerplatenest12345 --log=/var/www/boilerplatenest12345/files/nest-backend-out.log start dist/main.js
 ```
 
 2. Запустить `pm2 save` для сохранения изменений в PM2
