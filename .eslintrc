@@ -2,10 +2,9 @@
     "extends": [
         "@steroidsjs/eslint-config/backend"
     ],
+    "plugins": ["boilerplate-custom-rules"],
     "rules": {
-        "import/no-extraneous-dependencies": ["error", { "devDependencies": ["**/*.test.ts"] }]
-    },
-    "ignorePatterns": [
-        "src/**/migrations/*.ts"
-    ]
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": ["**/*.test.ts"] }],
+        "boilerplate-custom-rules/no-query-builder-in-migrations": "error"
+    }
 }
