@@ -10,38 +10,28 @@ module.exports = {
 
     create(context) {
         const filename = context.getFilename();
+        const normalizedPath = filename.replace(/\\/g, '/');
 
-        // ESLint может передавать <input> при stdin
-        if (filename === '<input>') {
+        if (!normalizedPath.includes('/migrations/')) {
             return {};
         }
 
-        const normalizedPath = filename.split(path.sep).join('/');
-
-        const isMigrationFile = normalizedPath.includes('/migrations/');
-
-        if (!isMigrationFile) {
-            return {};
-        }
+        const isForbiddenCreateQueryBuilder = (node) => node.property?.name === 'createQueryBuilder'
+            && node.object?.type === 'MemberExpression'
+            && node.object.property?.name === 'manager'
+            && node.object.object?.type === 'Identifier'
+            && node.object.object.name === 'queryRunner';
 
         return {
             MemberExpression(node) {
-                if (
-                    node.property
-                    && node.property.name === 'createQueryBuilder'
-                    && node.object
-                    && node.object.type === 'MemberExpression'
-                    && node.object.property
-                    && node.object.property.name === 'manager'
-                    && node.object.object
-                    && node.object.object.type === 'Identifier'
-                    && node.object.object.name === 'queryRunner'
-                ) {
-                    context.report({
-                        node,
-                        messageId: 'forbidden',
-                    });
+                if (!isForbiddenCreateQueryBuilder(node)) {
+                    return;
                 }
+
+                context.report({
+                    node,
+                    messageId: 'forbidden',
+                });
             },
         };
     },
