@@ -10,9 +10,9 @@ module.exports = {
 
     create(context) {
         const filename = context.getFilename();
-        const normalizedPath = filename.replace(/\\/g, '/');
+        const isMigrationFile = filename.split(path.sep).includes('migrations');
 
-        if (!normalizedPath.includes('/migrations/')) {
+        if (!isMigrationFile) {
             return {};
         }
 
