@@ -18,7 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "resolveJsonModule": true,
-    "preserveWatchOutput": true
+    "preserveWatchOutput": true,
+    "useDefineForClassFields": false
   },
   "include": [
     "src/**/*",
