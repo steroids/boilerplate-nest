@@ -61,6 +61,37 @@ yarn cli migrate:generate
 yarn cli migrate
 ```
 
+### Ограничение доступа к файлам
+Пример конфигурации nginx
+```
+location /files/ {
+    auth_request /internal/files/auth;
+    alias /var/www/files/;
+}
+
+location /internal/files/auth {
+    internal;
+    proxy_pass http://host.docker.internal:9669/internal/file/check-access;
+    proxy_set_header X-Original-URI $request_uri;
+    proxy_set_header Authorization $http_authorization;
+    proxy_set_header Cookie $http_cookie;
+}
+```
+`auth_request` говорит nginx-у сделать подзапрос по указанному пути для проверки, можно ли обработать исходный запрос.
+В зависимости от кода ответа подзапроса:
+- 2xx - доступ разрешен
+- 401 или 403 - доступ запрещен с соответствующим кодом
+- остальные коды - считаются ошибкой, вернется 500
+
+Сделать сервис, реализующий `IFileAccessChecker` для проверки доступа и добавить его в модуль
+```
+{
+    provide: FILE_ACCESS_CHECKER,
+    useClass: FileAccessCheckerService,
+},
+```
+По умолчанию используется `AllowAllFileAccessChecker` который всегда разрешает доступ
+
 ## Запуск приложения
 
 ### Режим разработки
