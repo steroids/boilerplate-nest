@@ -18,17 +18,18 @@ import {UserRepository} from './repositories/UserRepository';
     ...coreModule,
     tables: ModuleHelper.importDir(join(__dirname, '/tables')),
     module: (config) => {
-        const module = coreModule.module(config) as any;
-        return {
-            ...module,
-            controllers: ModuleHelper.importDir(__dirname + '/controllers'),
-            imports: [
-                forwardRef(() => AuthModule),
-            ],
-            providers: [
-                ...module.providers,
-                UserCliCommandService,
+        const baseModule = coreModule.module ? coreModule.module(config) : {};
 
+        const baseProviders = baseModule.providers ?? [];
+        const baseExports = baseModule.exports ?? [];
+
+        return {
+            ...baseModule,
+            controllers: ModuleHelper.importDir(__dirname + '/controllers'),
+            imports: [forwardRef(() => AuthModule)],
+            providers: [
+                ...baseProviders,
+                UserCliCommandService,
                 {
                     provide: IUserRepository,
                     useClass: UserRepository,
@@ -40,15 +41,14 @@ import {UserRepository} from './repositories/UserRepository';
                 {
                     provide: IUserUpdatePasswordUseCase,
                     inject: [IUserService, ISessionService],
-                    useFactory: (userService: IUserService, sessionService: ISessionService) => (
-                        new UserUpdatePasswordUseCase(userService, sessionService)
-                    ),
+                    useFactory: (userService: IUserService, sessionService: ISessionService) =>
+                        new UserUpdatePasswordUseCase(userService, sessionService),
                 },
 
                 ...userUseCases,
             ],
             exports: [
-                ...module.exports,
+                ...baseExports,
                 IUserService,
                 IUserRepository,
                 IUserUpdatePasswordUseCase,
@@ -56,5 +56,4 @@ import {UserRepository} from './repositories/UserRepository';
         };
     },
 })
-export class UserModule {
-}
+export class UserModule {}

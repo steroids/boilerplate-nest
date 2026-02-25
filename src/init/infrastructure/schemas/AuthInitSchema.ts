@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {UserSchema} from '@steroidsjs/nest/infrastructure/tests/app/schemas/UserSchema';
+import {UserSchema} from '../../../user/infrastructure/schemas/UserSchema';
 
 export class AuthInitSchema {
     @ApiProperty()
