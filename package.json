@@ -21,7 +21,7 @@
     "migrate:deploy": "CLI_PATH=./dist/cli.js bash -c 'npx nestjs-command migrate'"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "dependencies": {
     "@nestjs/axios": "^3.0.0",
