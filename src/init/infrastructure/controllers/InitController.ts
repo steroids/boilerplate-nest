@@ -1,14 +1,16 @@
-import {Body, Controller, Inject, Post} from '@nestjs/common';
+import {Body, Controller, Inject, Post, UseGuards} from '@nestjs/common';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {ContextDto} from '@steroidsjs/nest/usecases/dtos/ContextDto';
 import {Context} from '@steroidsjs/nest/infrastructure/decorators/Context';
 import {IUserService} from '@steroidsjs/nest-modules/user/services/IUserService';
+import {PublicJwtAuthGuard} from '@steroidsjs/nest-auth/infrastructure/guards/PublicJwtAuthGuard';
 import {AuthInitSchema} from '../schemas/AuthInitSchema';
 import getExportedEnums from '../helpers/getExportedEnums';
 import {InitRequestDto} from '../../usecases/dtos/InitRequestDto';
 import {exportEnums} from '../helpers/entitiesExporter';
 
 @ApiTags('Авторизация')
+@UseGuards(PublicJwtAuthGuard)
 @Controller('/init')
 export class InitController {
     constructor(
