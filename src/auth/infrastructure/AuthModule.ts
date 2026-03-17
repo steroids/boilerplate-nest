@@ -24,7 +24,7 @@ import {AuthCliCommandService} from './commands/AuthCliCommandService';
                 ...(module.imports ?? []),
             ],
             controllers: [
-                ...(module.controllers ?? []).filter(controller => controller !== BaseAuthController),
+                ...(module.controllers ?? [])),
             ],
             providers: [
                 AuthCliCommandService,

@@ -1,8 +1,9 @@
-import {Body, Controller, Inject, Post} from '@nestjs/common';
+import {Body, Controller, Inject, Post, UseGuards} from '@nestjs/common';
 import {ApiOkResponse, ApiTags} from '@nestjs/swagger';
 import {ContextDto} from '@steroidsjs/nest/usecases/dtos/ContextDto';
 import {Context} from '@steroidsjs/nest/infrastructure/decorators/Context';
 import {IUserService} from '@steroidsjs/nest-modules/user/services/IUserService';
+import {PublicJwtAuthGuard} from '@steroidsjs/nest-auth/infrastructure/guards/PublicJwtAuthGuard';
 import {AuthInitSchema} from '../schemas/AuthInitSchema';
 import getExportedEnums from '../helpers/getExportedEnums';
 import {InitRequestDto} from '../../usecases/dtos/InitRequestDto';
@@ -18,16 +19,17 @@ export class InitController {
 
     @Post()
     @ApiOkResponse({type: AuthInitSchema})
-    async init(
-        @Context() context: ContextDto,
-        @Body() dto: InitRequestDto,
-    ) {
+    @UseGuards(PublicJwtAuthGuard)
+    async init(@Context() context: ContextDto, @Body() dto: InitRequestDto) {
         const user = context.user?.id ? await this.userService.findById(context.user.id) : null;
 
         const exportedEnums = exportEnums(getExportedEnums());
 
         return {
-            user,
+            user: {
+                ...user,
+                roles: context.user?.permissions,
+            },
             meta: {
                 ...exportedEnums,
             },
