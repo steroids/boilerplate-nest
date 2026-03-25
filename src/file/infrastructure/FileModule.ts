@@ -2,6 +2,7 @@ import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
 import coreModule from '@steroidsjs/nest-file';
 import {IFileModuleConfig} from '@steroidsjs/nest-file/infrastructure/config';
 import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper';
+import {InternalFileController} from './controllers/InternalFileController';
 
 @Module({
     ...coreModule,
@@ -21,6 +22,7 @@ import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper
             ],
             controllers: [
                 ...(module.controllers ?? []),
+                InternalFileController,
             ],
             exports: [
                 ...(module.exports ?? []),
