@@ -1,17 +1,16 @@
-import {join} from 'path';
 import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
 import coreModule from '@steroidsjs/nest-auth';
 import {IAuthModuleConfig} from '@steroidsjs/nest-auth/infrastructure/config';
-import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper';
 import {AuthController as BaseAuthController} from '@steroidsjs/nest-auth/infrastructure/controllers/AuthController';
 import {authUseCases} from '../usecases';
 import {AuthCliCommandService} from './commands/AuthCliCommandService';
+import {tables} from './tables';
 
 @Module({
     ...coreModule,
     tables: [
         ...(coreModule.tables ?? []),
-        ...ModuleHelper.importDir(join(__dirname, '/tables')),
+        ...tables,
     ],
     module: (config: IAuthModuleConfig) => {
         if (!coreModule.module) {

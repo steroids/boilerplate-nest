@@ -1,13 +1,13 @@
 import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
 import coreModule from '@steroidsjs/nest-file';
 import {IFileModuleConfig} from '@steroidsjs/nest-file/infrastructure/config';
-import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper';
+import {tables} from './tables';
 
 @Module({
     ...coreModule,
     tables: [
         ...(coreModule.tables ?? []),
-        ...ModuleHelper.importDir(__dirname + '/tables'),
+        ...tables,
     ],
     module: (config: IFileModuleConfig) => {
         if (!coreModule.module) {

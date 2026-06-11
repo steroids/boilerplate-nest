@@ -1,5 +1,3 @@
-import {join} from 'path';
-import {ModuleHelper} from '@steroidsjs/nest/infrastructure/helpers/ModuleHelper';
 import coreModule from '@steroidsjs/nest-user';
 import {ISessionService} from '@steroidsjs/nest-auth/domain/interfaces/ISessionService';
 import {Module} from '@steroidsjs/nest/infrastructure/decorators/Module';
@@ -13,10 +11,12 @@ import {UserService} from '../domain/services/UserService';
 import {IUserRepository} from '../domain/interfaces/IUserRepository';
 import {UserCliCommandService} from './UserCliCommandService';
 import {UserRepository} from './repositories/UserRepository';
+import {tables} from './tables';
+import {controllers} from './controllers';
 
 @Module({
     ...coreModule,
-    tables: ModuleHelper.importDir(join(__dirname, '/tables')),
+    tables,
     module: (config) => {
         const baseModule = coreModule.module ? coreModule.module(config) : {};
 
@@ -25,7 +25,7 @@ import {UserRepository} from './repositories/UserRepository';
 
         return {
             ...baseModule,
-            controllers: ModuleHelper.importDir(__dirname + '/controllers'),
+            controllers,
             imports: [forwardRef(() => AuthModule)],
             providers: [
                 ...baseProviders,
